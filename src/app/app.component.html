@@ -6,12 +6,71 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        This is the expansion title
+        Add Expense
       </mat-panel-title>
-      <mat-panel-description>
-        This is a summary of the content
-      </mat-panel-description>
     </mat-expansion-panel-header>
-    <p>This is the primary content of the panel.</p>
+    <div class="form-container">
+      <form [formGroup]="expenseForm">
+      <mat-form-field>
+        <input matInput type="number" formControlName="amount" placeholder="Amount">
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select placeholder="Card" formControlName="card">
+          <mat-option [value]="card" *ngFor="let card of cards">{{card}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+        <mat-form-field>
+          <mat-select placeholder="By" formControlName="user">
+            <mat-option [value]="user" *ngFor="let user of users">{{user}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput [matDatepicker]="picker" placeholder="Date" formControlName="date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <button mat-raised-button color="primary">Save</button>
+        <button mat-raised-button color="primary">Cancel</button>
+      </form>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-divider></mat-divider>
+
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title>View Expenses</mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-form-field>
+      <mat-select placeholder="Month">
+        <mat-option value="01">January</mat-option>
+        <mat-option value="02">February</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> User </th>
+        <td mat-cell *matCellDef="let element"> {{element.user}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="card">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Card </th>
+        <td mat-cell *matCellDef="let element"> {{element.card}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+        <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
   </mat-expansion-panel>
 </section>
