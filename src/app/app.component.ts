@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Expense} from './expense.model';
 
 export type User = 'Ansuman' | 'Debasrita';
@@ -21,9 +21,8 @@ export class AppComponent implements OnInit{
     new Expense('Ansuman', 'TranseferWise', '12/26/2019', 15),
     new Expense('Debasrita', 'UbsCredit', '12/26/2019', 20)
   ];
-  dataSource = new MatTableDataSource(this.expenses);
+  dataSource: MatTableDataSource<Expense>;
   expenseForm: FormGroup;
-
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private fb: FormBuilder) {
@@ -31,16 +30,38 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.dataSource.sort = this.sort;
     this.createExpenseForm();
+    this.createExpenseTable();
   }
 
   private createExpenseForm() {
     this.expenseForm = this.fb.group({
-      user: ['Ansuman'],
-      amount: [''],
-      date: [new Date()],
-      card: ['TranseferWise']
+      user: ['', [Validators.required]],
+      amount: ['', [Validators.required]],
+      date: ['', [Validators.required]],
+      card: ['', [Validators.required]]
     });
+
+    this.setDefaultExpense();
+  }
+
+  setDefaultExpense() {
+    this.expenseForm.setValue({
+      user: 'Ansuman',
+      amount: null,
+      date: new Date(),
+      card: 'TranseferWise',
+    });
+  }
+
+  onSubmit() {
+    this.expenses.push(this.expenseForm.value);
+    this.createExpenseTable();
+    this.setDefaultExpense();
+  }
+
+  private createExpenseTable() {
+    this.dataSource = new MatTableDataSource(this.expenses);
+    this.dataSource.sort = this.sort;
   }
 }
