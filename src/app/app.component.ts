@@ -2,7 +2,9 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+
 import {Expense} from './expense.model';
+import {AngularFirestore} from '@angular/fire/firestore';
 
 export type User = 'Ansuman' | 'Debasrita';
 export type Card = 'Forex' | 'TranseferWise' | 'CreditSuisse' | 'UbsDebit' | 'UbsCredit';
@@ -25,13 +27,22 @@ export class AppComponent implements OnInit{
   expenseForm: FormGroup;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private firestore: AngularFirestore) {
 
   }
 
   ngOnInit() {
     this.createExpenseForm();
-    this.createExpenseTable();
+    this.firestore.collection('expense').snapshotChanges().subscribe(data => {
+      this.expenses = data.map(e => {
+        return {
+          id: e.payload.doc.id,
+          ...e.payload.doc.data()
+        } as Expense;
+      });
+      console.log(this.expenses);
+      this.createExpenseTable();
+    });
   }
 
   private createExpenseForm() {
@@ -55,7 +66,9 @@ export class AppComponent implements OnInit{
   }
 
   onSubmit() {
-    this.expenses.push(this.expenseForm.value);
+    // this.expenses.push(this.expenseForm.value);
+
+    this.firestore.collection('expense').add(this.expenseForm.value).then(console.log);
     this.createExpenseTable();
     this.setDefaultExpense();
   }
