@@ -5,6 +5,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import {Expense} from './expense.model';
 import {AngularFirestore} from '@angular/fire/firestore';
+import {MatSnackBar} from '@angular/material';
 
 export type User = 'Ansuman' | 'Debasrita';
 export type Card = 'Forex' | 'TranseferWise' | 'CreditSuisse' | 'UbsDebit' | 'UbsCredit';
@@ -18,16 +19,15 @@ export class AppComponent implements OnInit{
   title = 'expense-manager';
   cards: Card[] = ['Forex', 'TranseferWise', 'CreditSuisse', 'UbsDebit', 'UbsCredit'];
   users: User[] = ['Ansuman', 'Debasrita'];
-  displayedColumns: string[] = ['user', 'card', 'date', 'amount'];
-  expenses: Expense[] = [
-    new Expense('Ansuman', 'TranseferWise', '12/26/2019', 15),
-    new Expense('Debasrita', 'UbsCredit', '12/26/2019', 20)
-  ];
+  displayedColumns: string[] = ['user', 'card', 'date', 'amount', 'id'];
+  expenses: Expense[] = [];
   dataSource: MatTableDataSource<Expense>;
   expenseForm: FormGroup;
+  totalExpense: number;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild('toast', {static: true}) toast;
 
-  constructor(private fb: FormBuilder, private firestore: AngularFirestore) {
+  constructor(private fb: FormBuilder, private firestore: AngularFirestore, private snackBar: MatSnackBar) {
 
   }
 
@@ -39,8 +39,8 @@ export class AppComponent implements OnInit{
           id: e.payload.doc.id,
           ...e.payload.doc.data()
         } as Expense;
-      });
-      console.log(this.expenses);
+      }).sort((a: any, b: any) => b.date.seconds - a.date.seconds );
+      this.totalExpense = this.expenses.map( expense => expense.amount).reduce((a, b) => a + b, 0);
       this.createExpenseTable();
     });
   }
@@ -66,9 +66,10 @@ export class AppComponent implements OnInit{
   }
 
   onSubmit() {
-    // this.expenses.push(this.expenseForm.value);
-
-    this.firestore.collection('expense').add(this.expenseForm.value).then(console.log);
+    this.firestore.collection('expense').add(this.expenseForm.value);
+    this.snackBar.openFromTemplate(this.toast, {
+      duration: 1000,
+    });
     this.createExpenseTable();
     this.setDefaultExpense();
   }
@@ -77,4 +78,14 @@ export class AppComponent implements OnInit{
     this.dataSource = new MatTableDataSource(this.expenses);
     this.dataSource.sort = this.sort;
   }
+
+  deleteExpense(id: string) {
+    this.firestore.doc<Expense>(`expense/${id}`).delete().then( _ => {
+      this.snackBar.open('Expense deleted');
+      setTimeout( () => {
+        this.snackBar.dismiss();
+      }, 2000);
+    });
+  }
+
 }

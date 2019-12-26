@@ -15,6 +15,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatNativeDateModule} from '@angular/material';
 import {MatTableModule} from '@angular/material/table';
 import {MatSortModule} from '@angular/material/sort';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -34,9 +35,10 @@ import {MatSortModule} from '@angular/material/sort';
     MatDatepickerModule,
     MatNativeDateModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    MatSnackBarModule
   ],
   exports: [MatCardModule, MatToolbarModule, MatButtonModule, MatSidenavModule, MatDividerModule, MatGridListModule, MatExpansionModule, MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatDatepickerModule, MatNativeDateModule, MatTableModule, MatSortModule]
+    MatDatepickerModule, MatNativeDateModule, MatTableModule, MatSortModule, MatSnackBarModule]
 })
 export class SharedModule { }
