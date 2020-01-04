@@ -2,14 +2,14 @@
   <h1>Manage Expenses</h1>
 </mat-toolbar>
 <section class="container">
-  <mat-expansion-panel>
+  <mat-expansion-panel [expanded]="expenseForm.value.id">
     <mat-expansion-panel-header>
       <mat-panel-title>
         Add Expense
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div class="form-container">
-      <form [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
+      <form #formDirective="ngForm" [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
         <mat-form-field>
           <mat-select placeholder="By" formControlName="user">
             <mat-option [value]="user" *ngFor="let user of users">{{user}}</mat-option>
@@ -28,8 +28,11 @@
         <mat-form-field>
           <input matInput type="number" formControlName="amount" placeholder="Amount">
         </mat-form-field>
+        <mat-form-field>
+          <input matInput type="text" formControlName="where" placeholder="Where">
+        </mat-form-field>
         <button mat-raised-button color="primary" type="submit" [disabled]="!expenseForm.valid">Save</button>
-        <button mat-raised-button color="primary" type="button" (click)="setDefaultExpense();">Cancel</button>
+        <button mat-raised-button color="primary" type="button" (click)="resetForm();">Cancel</button>
       </form>
     </div>
   </mat-expansion-panel>
@@ -67,9 +70,15 @@
         <td mat-cell *matCellDef="let element"> {{element.amount}} </td>
       </ng-container>
 
+      <ng-container matColumnDef="where">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Where </th>
+        <td mat-cell *matCellDef="let element"> {{element.where}} </td>
+      </ng-container>
+
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-        <td mat-cell *matCellDef="let element"> <button type="button" color="warn" mat-raised-button (click)="deleteExpense(element.id)">Delete</button> </td>
+        <td mat-cell *matCellDef="let element"> <button type="button" color="warn" mat-raised-button (click)="deleteExpense(element.id)">Delete</button>
+          <button type="button" color="warn" mat-raised-button (click)="editExpense(element)">Edit</button></td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -84,5 +93,5 @@
 </section>
 
 <ng-template #toast>
-  Expense Added
+  Expense Added/updated successfully
 </ng-template>
